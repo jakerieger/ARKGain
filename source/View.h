@@ -4,8 +4,12 @@
 
 #pragma once
 
+#include "pluginterfaces/gui/iplugview.h"
 
+// TODO: Implement IPlugView here. This is the class that handles the actual UI.
 
-class View {
-
+class View : public Steinberg::IPlugView {
+public:
+    View()          = default;
+    virtual ~View() = default;
 };

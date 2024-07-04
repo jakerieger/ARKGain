@@ -8,8 +8,6 @@
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "public.sdk/source/vst/vstaudioprocessoralgo.h"
-#include "pluginterfaces/base/ibstream.h"
-#include "public.sdk/source/vst/utility/audiobuffers.h"
 
 #include <iostream>
 
@@ -143,9 +141,9 @@ namespace ARK {
                         case 0:
                             if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) ==
                                 kResultTrue) {
-                                mGain = static_cast<float>(value * 60.0 -
-                                                           30.0);  // convert back from normalized
-                                                                   // param value (-30.f <-> 30.f)
+                                mGain = static_cast<float>(value * 90.0 -
+                                                           60.0);  // convert back from normalized
+                                                                   // param value (-60.f <-> 30.f)
                             }
                             break;
                         default:

@@ -26,7 +26,7 @@ namespace ARK {
 
         // Here you could register some parameters
         const auto gainParam =
-          new Vst::RangeParameter(USTRING("Gain"), 0, USTRING("dB"), -30.0f, 30.0f, 0.000001f);
+          new Vst::RangeParameter(USTRING("Gain"), 0, USTRING("dB"), -60.0f, 30.0f, 0.000001f);
 
         parameters.addParameter(gainParam);
 

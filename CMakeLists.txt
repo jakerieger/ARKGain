@@ -31,6 +31,8 @@ smtg_add_vst3plugin(ARKGain
         source/Controller.h
         source/Controller.cpp
         source/Factory.cpp
+        source/View.h
+        source/View.cpp
 )
 
 #- VSTGUI Wanted ----
