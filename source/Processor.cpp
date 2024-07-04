@@ -11,9 +11,17 @@
 #include "pluginterfaces/base/ibstream.h"
 #include "public.sdk/source/vst/utility/audiobuffers.h"
 
+#include <iostream>
+
 using namespace Steinberg;
 
 namespace ARK {
+    namespace DSP {
+        float dBToLinear(const float db) {
+            return std::pow(10.f, db / 20.f);
+        }
+    }  // namespace DSP
+
     namespace Processors {
         template<typename SampleType>
         tresult MonoToMono(SampleType** inputBuffers,
@@ -135,7 +143,9 @@ namespace ARK {
                         case 0:
                             if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) ==
                                 kResultTrue) {
-                                mGain = static_cast<float>(value);
+                                mGain = static_cast<float>(value * 60.0 -
+                                                           30.0);  // convert back from normalized
+                                                                   // param value (-30.f <-> 30.f)
                             }
                             break;
                         default:
@@ -181,33 +191,35 @@ namespace ARK {
         const auto numInChannels  = data.inputs->numChannels;
         const auto numOutChannels = data.outputs->numChannels;
 
+        auto linearGain = DSP::dBToLinear(mGain);
+
         // Mono to Mono
         if (numInChannels == 1 && numOutChannels == 1) {
             return Processors::MonoToMono(currentInputBuffers,
                                           currentOutputBuffers,
                                           numFrames,
-                                          mGain);
+                                          linearGain);
         }
         // Mono to Stereo
         if (numInChannels == 1 && numOutChannels == 2) {
             return Processors::MonoToStereo(currentInputBuffers,
                                             currentOutputBuffers,
                                             numFrames,
-                                            mGain);
+                                            linearGain);
         }
         // Stereo to Mono
         if (numInChannels == 2 && numOutChannels == 1) {
             return Processors::StereoToMono(currentInputBuffers,
                                             currentOutputBuffers,
                                             numFrames,
-                                            mGain);
+                                            linearGain);
         }
         // Stereo to Stereo
         if (numInChannels == 2 && numOutChannels == 2) {
             return Processors::StereoToStereo(currentInputBuffers,
                                               currentOutputBuffers,
                                               numFrames,
-                                              mGain);
+                                              linearGain);
         }
 
         return kResultFalse;
