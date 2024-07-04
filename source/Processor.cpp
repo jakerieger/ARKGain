@@ -2,8 +2,8 @@
 // Copyright(c) 2024 ARKSYN Audio.
 //------------------------------------------------------------------------
 
-#include "ARKprocessor.h"
-#include "ARKcids.h"
+#include "Processor.h"
+#include "CIDs.h"
 
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"

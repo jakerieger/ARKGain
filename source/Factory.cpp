@@ -2,9 +2,9 @@
 // Copyright(c) 2024 ARKSYN Audio.
 //------------------------------------------------------------------------
 
-#include "ARKprocessor.h"
-#include "ARKcontroller.h"
-#include "ARKcids.h"
+#include "Processor.h"
+#include "Controller.h"
+#include "CIDs.h"
 #include "version.h"
 
 #include "public.sdk/source/main/pluginfactory.h"
@@ -51,6 +51,6 @@ DEF_CLASS2(
                                       // instantiated
 
 //----for others Plug-ins contained in this factory, put like for the first Plug-in different
-//DEF_CLASS2---
+// DEF_CLASS2---
 
 END_FACTORY

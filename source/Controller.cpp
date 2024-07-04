@@ -2,8 +2,8 @@
 // Copyright(c) 2024 ARKSYN Audio.
 //------------------------------------------------------------------------
 
-#include "ARKcontroller.h"
-#include "ARKcids.h"
+#include "Controller.h"
+#include "CIDs.h"
 #include "vstgui/plugin-bindings/vst3editor.h"
 
 using namespace Steinberg;
