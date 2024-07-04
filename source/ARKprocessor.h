@@ -48,6 +48,9 @@ namespace ARK {
         Steinberg::tresult PLUGIN_API setState(Steinberg::IBStream* state) SMTG_OVERRIDE;
         Steinberg::tresult PLUGIN_API getState(Steinberg::IBStream* state) SMTG_OVERRIDE;
 
+        template<typename SampleType>
+        Steinberg::tresult PLUGIN_API processAudio(Steinberg::Vst::ProcessData& data) const;
+
         //------------------------------------------------------------------------
     protected:
     };

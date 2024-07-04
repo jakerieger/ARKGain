@@ -7,6 +7,9 @@
 
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
+#include "public.sdk/source/vst/vstaudioprocessoralgo.h"
+#include "pluginterfaces/base/ibstream.h"
+#include "public.sdk/source/vst/utility/audiobuffers.h"
 
 using namespace Steinberg;
 
@@ -78,48 +81,95 @@ namespace ARK {
             }
         }*/
 
-        //--- Here you have to implement your processing
+        // //--- Here you have to implement your processing
+        //
+        // if (data.numSamples > 0) {
+        //     //--- ------------------------------------------
+        //     // here as example a default implementation where we try to copy the inputs to the
+        //     // outputs: if less input than outputs then clear outputs
+        //     //--- ------------------------------------------
+        //
+        //     int32 minBus = std::min(data.numInputs, data.numOutputs);
+        //     for (int32 i = 0; i < minBus; i++) {
+        //         int32 minChan = std::min(data.inputs[i].numChannels,
+        //         data.outputs[i].numChannels); for (int32 c = 0; c < minChan; c++) {
+        //             // do not need to be copied if the buffers are the same
+        //             if (data.outputs[i].channelBuffers32[c] !=
+        //             data.inputs[i].channelBuffers32[c]) {
+        //                 memcpy(data.outputs[i].channelBuffers32[c],
+        //                        data.inputs[i].channelBuffers32[c],
+        //                        data.numSamples * sizeof(Vst::Sample32));
+        //             }
+        //         }
+        //         data.outputs[i].silenceFlags = data.inputs[i].silenceFlags;
+        //
+        //         // clear the remaining output buffers
+        //         for (int32 c = minChan; c < data.outputs[i].numChannels; c++) {
+        //             // clear output buffers
+        //             memset(data.outputs[i].channelBuffers32[c],
+        //                    0,
+        //                    data.numSamples * sizeof(Vst::Sample32));
+        //
+        //             // inform the host that this channel is silent
+        //             data.outputs[i].silenceFlags |= ((uint64)1 << c);
+        //         }
+        //     }
+        //     // clear the remaining output buffers
+        //     for (int32 i = minBus; i < data.numOutputs; i++) {
+        //         // clear output buffers
+        //         for (int32 c = 0; c < data.outputs[i].numChannels; c++) {
+        //             memset(data.outputs[i].channelBuffers32[c],
+        //                    0,
+        //                    data.numSamples * sizeof(Vst::Sample32));
+        //         }
+        //         // inform the host that this bus is silent
+        //         data.outputs[i].silenceFlags = ((uint64)1 << data.outputs[i].numChannels) - 1;
+        //     }
+        // }
 
-        if (data.numSamples > 0) {
-            //--- ------------------------------------------
-            // here as example a default implementation where we try to copy the inputs to the
-            // outputs: if less input than outputs then clear outputs
-            //--- ------------------------------------------
+        if (data.numInputs == 0 || data.numOutputs == 0 || data.numSamples == 0) {
+            return kResultOk;
+        }
 
-            int32 minBus = std::min(data.numInputs, data.numOutputs);
-            for (int32 i = 0; i < minBus; i++) {
-                int32 minChan = std::min(data.inputs[i].numChannels, data.outputs[i].numChannels);
-                for (int32 c = 0; c < minChan; c++) {
-                    // do not need to be copied if the buffers are the same
-                    if (data.outputs[i].channelBuffers32[c] != data.inputs[i].channelBuffers32[c]) {
-                        memcpy(data.outputs[i].channelBuffers32[c],
-                               data.inputs[i].channelBuffers32[c],
-                               data.numSamples * sizeof(Vst::Sample32));
-                    }
-                }
-                data.outputs[i].silenceFlags = data.inputs[i].silenceFlags;
+        return this->processAudio<float>(data);
+    }
 
-                // clear the remaining output buffers
-                for (int32 c = minChan; c < data.outputs[i].numChannels; c++) {
-                    // clear output buffers
-                    memset(data.outputs[i].channelBuffers32[c],
-                           0,
-                           data.numSamples * sizeof(Vst::Sample32));
+    template<typename SampleType>
+    tresult ARKGainProcessor::processAudio(Steinberg::Vst::ProcessData& data) const {
+        using namespace Steinberg::Vst;
 
-                    // inform the host that this channel is silent
-                    data.outputs[i].silenceFlags |= ((uint64)1 << c);
-                }
+        const int32 numFrames   = data.numSamples;
+        uint32 sampleFramesSize = getSampleFramesSizeInBytes(processSetup, numFrames);
+        auto** currentInputBuffers =
+          (SampleType**)getChannelBuffersPointer(processSetup, data.inputs[0]);
+        auto** currentOutputBuffers =
+          (SampleType**)getChannelBuffersPointer(processSetup, data.outputs[0]);
+
+        // If we have only silence, clear the output and do nothing
+        data.outputs->silenceFlags = data.inputs->silenceFlags ? 0x7FFFF : 0;
+        if (data.inputs->silenceFlags) {
+            memset(currentOutputBuffers[0], 0, sampleFramesSize);
+
+            if (data.numOutputs > 1) {
+                memset(currentOutputBuffers[1], 0, sampleFramesSize);
             }
-            // clear the remaining output buffers
-            for (int32 i = minBus; i < data.numOutputs; i++) {
-                // clear output buffers
-                for (int32 c = 0; c < data.outputs[i].numChannels; c++) {
-                    memset(data.outputs[i].channelBuffers32[c],
-                           0,
-                           data.numSamples * sizeof(Vst::Sample32));
-                }
-                // inform the host that this bus is silent
-                data.outputs[i].silenceFlags = ((uint64)1 << data.outputs[i].numChannels) - 1;
+
+            return kResultOk;
+        }
+
+        SampleType tmp;
+        SampleType* inputMono   = currentInputBuffers[0];
+        SampleType* outputLeft  = currentOutputBuffers[0];
+        SampleType* outputRight = currentOutputBuffers[1];
+
+        constexpr float kGain = 20.f;  // TODO: Hard-coded test value
+
+        for (int32 n = 0; n < numFrames; n++) {
+            tmp           = inputMono[n];
+            outputLeft[n] = tmp * kGain;
+
+            if (data.numOutputs > 1) {
+                outputRight[n] = tmp * kGain;
             }
         }
 
@@ -135,12 +185,9 @@ namespace ARK {
     //------------------------------------------------------------------------
     tresult PLUGIN_API ARKGainProcessor::canProcessSampleSize(int32 symbolicSampleSize) {
         // by default kSample32 is supported
-        if (symbolicSampleSize == Vst::kSample32)
+        // disable the trailing comment if your processing supports kSample64
+        if (symbolicSampleSize == Vst::kSample32 /*|| symbolicSampleSize == Vst::kSample64*/)
             return kResultTrue;
-
-        // disable the following comment if your processing support kSample64
-        /* if (symbolicSampleSize == Vst::kSample64)
-            return kResultTrue; */
 
         return kResultFalse;
     }
