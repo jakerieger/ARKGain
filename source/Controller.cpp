@@ -4,6 +4,8 @@
 
 #include "Controller.h"
 #include "CIDs.h"
+#include "base/source/fstreamer.h"
+#include "pluginterfaces/base/ustring.h"
 #include "vstgui/plugin-bindings/vst3editor.h"
 
 using namespace Steinberg;
@@ -23,6 +25,10 @@ namespace ARK {
         }
 
         // Here you could register some parameters
+        const auto gainParam =
+          new Vst::RangeParameter(USTRING("Gain"), 0, USTRING("dB"), -30.0f, 30.0f, 0.000001f);
+
+        parameters.addParameter(gainParam);
 
         return result;
     }
@@ -40,6 +46,15 @@ namespace ARK {
         // Here you get the state of the component (Processor part)
         if (!state)
             return kResultFalse;
+
+        IBStreamer streamer(state, kLittleEndian);
+
+        float gain;
+        if (streamer.readFloat(gain) == false) {
+            return kResultFalse;
+        }
+
+        setParamNormalized(0, gain);
 
         return kResultOk;
     }
@@ -64,8 +79,9 @@ namespace ARK {
         // Here the Host wants to open your editor (if you have one)
         if (FIDStringsEqual(name, Vst::ViewType::kEditor)) {
             // create your editor here and return a IPlugView ptr of it
-            auto* view = new VSTGUI::VST3Editor(this, "view", "ARKeditor.uidesc");
-            return view;
+            // auto* view = new VSTGUI::VST3Editor(this, "view", "ARKeditor.uidesc");
+            // return view;
+            return nullptr;
         }
         return nullptr;
     }

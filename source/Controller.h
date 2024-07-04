@@ -19,7 +19,7 @@ namespace ARK {
 
         // Create function
         static Steinberg::FUnknown* createInstance(void* /*context*/) {
-            return (Steinberg::Vst::IEditController*)new ARKGainController;
+            return static_cast<IEditController*>(new ARKGainController);
         }
 
         //--- from IPluginBase -----------------------------------------------

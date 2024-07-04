@@ -17,8 +17,8 @@ namespace ARK {
         ~ARKGainProcessor() SMTG_OVERRIDE;
 
         // Create function
-        static Steinberg::FUnknown* createInstance(void* /*context*/) {
-            return (Steinberg::Vst::IAudioProcessor*)new ARKGainProcessor;
+        static FUnknown* createInstance(void* /*context*/) {
+            return static_cast<IAudioProcessor*>(new ARKGainProcessor);
         }
 
         //--- ---------------------------------------------------------------------
@@ -53,6 +53,7 @@ namespace ARK {
 
         //------------------------------------------------------------------------
     protected:
+        float mGain;
     };
 
     //------------------------------------------------------------------------
