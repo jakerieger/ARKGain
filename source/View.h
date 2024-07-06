@@ -7,7 +7,6 @@
 #include "public.sdk/source/vst/vsteditcontroller.h"
 
 #include <Windows.h>
-#include <cairo/cairo.h>
 
 // TODO: Implement IPlugView here. This is the class that handles the actual UI.
 
@@ -17,9 +16,7 @@ namespace ARK {
         explicit View(Steinberg::Vst::EditController* controller)
             : EditorView(controller), mHwnd(nullptr) {}
 
-        ~View() SMTG_OVERRIDE {
-            DestroyCairoSurface();
-        }
+        ~View() SMTG_OVERRIDE {}
 
         Steinberg::tresult PLUGIN_API isPlatformTypeSupported(Steinberg::FIDString type)
           SMTG_OVERRIDE;
@@ -44,11 +41,7 @@ namespace ARK {
 
     private:
         void Draw() const;
-        void CreateCairoSurface();
-        void DestroyCairoSurface();
 
         HWND mHwnd;
-        cairo_surface_t* mCairoSurface;
-        cairo_t* mCairo;
     };
 }  // namespace ARK

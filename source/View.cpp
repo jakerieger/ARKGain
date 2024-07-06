@@ -4,8 +4,6 @@
 
 #include "View.h"
 
-#include <cairo/cairo-win32.h>
-
 #define PLATFORM_WIN32 std::strcmp(type, kPlatformTypeHWND) == 0
 #define PLATFORM_X11 std::strcmp(type, kPlatformTypeX11EmbedWindowID) == 0
 #define PLATFORM_DARWIN std::strcmp(type, kPlatformTypeNSView) == 0
@@ -53,8 +51,6 @@ namespace ARK {
             if (!mHwnd)
                 return kResultFalse;
 
-            CreateCairoSurface();
-
             return kResultTrue;
         }
 
@@ -62,8 +58,6 @@ namespace ARK {
     }
 
     tresult View::removed() {
-        DestroyCairoSurface();
-
         if (mHwnd) {
             DestroyWindow(mHwnd);
             mHwnd = nullptr;
@@ -102,8 +96,6 @@ namespace ARK {
                          newSize->getWidth(),
                          newSize->getHeight(),
                          SWP_NOZORDER | SWP_NOMOVE);
-            DestroyCairoSurface();
-            CreateCairoSurface();
         }
 
         return kResultTrue;
@@ -125,43 +117,7 @@ namespace ARK {
         return EditorView::checkSizeConstraint(rect);
     }
 
-    void View::Draw() const {
-        if (mCairo) {
-            cairo_set_source_rgb(mCairo, 0.0, 0.0, 0.0);
-            cairo_paint(mCairo);
-
-            cairo_set_source_rgb(mCairo, 1.0, 0.0, 0.0);
-            cairo_move_to(mCairo, 10, 10);
-            cairo_line_to(mCairo, 100, 100);
-            cairo_stroke(mCairo);
-
-            HDC hdc = GetDC(mHwnd);
-            cairo_surface_flush(mCairoSurface);
-            BitBlt(hdc, 0, 0, 600, 300, cairo_win32_surface_get_dc(mCairoSurface), 0, 0, SRCCOPY);
-            ReleaseDC(mHwnd, hdc);
-        }
-    }
-
-    void View::CreateCairoSurface() {
-        if (mHwnd) {
-            HDC hdc       = GetDC(mHwnd);
-            mCairoSurface = cairo_win32_surface_create(hdc);
-            mCairo        = cairo_create(mCairoSurface);
-            ReleaseDC(mHwnd, hdc);
-        }
-    }
-
-    void View::DestroyCairoSurface() {
-        if (mCairo) {
-            cairo_destroy(mCairo);
-            mCairo = nullptr;
-        }
-
-        if (mCairoSurface) {
-            cairo_surface_destroy(mCairoSurface);
-            mCairoSurface = nullptr;
-        }
-    }
+    void View::Draw() const {}
 
     LRESULT CALLBACK View::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         View* view = nullptr;

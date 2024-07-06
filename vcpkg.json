@@ -1,15 +1,15 @@
 {
-  "name" : "arkgain",
-  "version-string" : "1.0.0",
-  "builtin-baseline" : "01f602195983451bc83e72f4214af2cbc495aa94",
-  "dependencies" : [ {
-    "name" : "cairo",
-    "version>=" : "1.18.0#1"
-  }, {
-    "name" : "cairomm",
-    "version>=" : "1.17.1#1"
-  }, {
-    "name" : "pkgconf",
-    "version>=" : "2.2.0"
-  } ]
+  "name": "arkgain",
+  "version-string": "1.0.0",
+  "builtin-baseline": "01f602195983451bc83e72f4214af2cbc495aa94",
+  "dependencies": [
+    {
+      "name": "pkgconf",
+      "version>=": "2.2.0"
+    },
+    {
+      "name": "nanosvg",
+      "version>=": "2023-12-29"
+    }
+  ]
 }
