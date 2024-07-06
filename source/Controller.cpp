@@ -4,6 +4,7 @@
 
 #include "Controller.h"
 #include "CIDs.h"
+#include "View.h"
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/base/ustring.h"
 #include "vstgui/plugin-bindings/vst3editor.h"
@@ -79,9 +80,8 @@ namespace ARK {
         // Here the Host wants to open your editor (if you have one)
         if (FIDStringsEqual(name, Vst::ViewType::kEditor)) {
             // create your editor here and return a IPlugView ptr of it
-            // auto* view = new VSTGUI::VST3Editor(this, "view", "ARKeditor.uidesc");
-            // return view;
-            return nullptr;
+            auto* view = new View(this);
+            return view;
         }
         return nullptr;
     }

@@ -58,9 +58,13 @@ smtg_target_add_plugin_snapshots(ARKGain
         resource/92F2B27B99945A8BBD45AC45A00B357A_snapshot_2.0x.png
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
+
 target_link_libraries(ARKGain
         PRIVATE
         sdk
+        PkgConfig::CAIRO
 )
 
 smtg_target_configure_version_file(ARKGain)

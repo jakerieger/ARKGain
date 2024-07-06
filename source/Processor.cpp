@@ -9,8 +9,6 @@
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "public.sdk/source/vst/vstaudioprocessoralgo.h"
 
-#include <iostream>
-
 using namespace Steinberg;
 
 namespace ARK {
