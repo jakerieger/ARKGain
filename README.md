@@ -11,14 +11,14 @@ rendering.
 
 ## Class Descriptions
 
-### CIDs
+### [CIDs](source/CIDs.h)
 
 Controller and processor UUIDs. This file will never be touched.
 
 *Required by the VST3 SDK and generated automatically when using Steinberg's project
 creator.*
 
-### Controller
+### [Controller](source/Controller.h)
 
 Handles plugin state. Parameters and editor views are managed here.
 
@@ -26,7 +26,7 @@ Handles plugin state. Parameters and editor views are managed here.
 automatically when using Steinberg's project
 creator.*
 
-### Factory
+### [Factory](source/Factory.cpp)
 
 Handles the actual creation of the plugin, and where you set plugin metadata like the name, version, and company that
 developed it.
@@ -35,19 +35,19 @@ developed it.
 automatically when using Steinberg's project
 creator.*
 
-### GraphicsContext
+### [GraphicsContext](source/GraphicsContext.h)
 
 Manages the OpenGL context used for rendering.
 
-### ParameterIds
+### [ParameterIds](source/ParameterIds.h)
 
 ID values for plugin parameters, used by both the controller and processor.
 
-### Platform
+### [Platform](source/Platform.h)
 
 Platform-specific `includes` and cross-platform helper utilities.
 
-### Processor
+### [Processor](source/Processor.h)
 
 This is where the actual audio data gets processed.
 
@@ -55,12 +55,12 @@ This is where the actual audio data gets processed.
 automatically when using Steinberg's project
 creator.*
 
-### View
+### [View](source/View.h)
 
 Extends `Steinberg::EditorView` in order to create a custom rendering context. VSTGUI implements the same interface
 for its UI solution. `Steinberg::EditorView` extends `Steinberg::IPlugView` which is the root interface all editor
 interfaces must implement and handles window creation, shutdown, and system events like key and mouse presses.
 
-### Win32Window
+### [Win32Window](source/Win32Window.h)
 
 Namespace that manages a Win32 window.
