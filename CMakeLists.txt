@@ -2,8 +2,12 @@ cmake_minimum_required(VERSION 3.14.0)
 
 option(SMTG_ENABLE_VST3_PLUGIN_EXAMPLES "Enable VST 3 Plug-in Examples" OFF)
 option(SMTG_ENABLE_VST3_HOSTING_EXAMPLES "Enable VST 3 Hosting Examples" OFF)
-
+set(VSTGUI_DISABLE ON CACHE BOOL "Disable VSTGUI")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.13 CACHE STRING "")
+
+# change this to the path of your vcpkg install
+set(VCPKG_CMAKE_PATH "C:/Users/conta/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_TOOLCHAIN_FILE ${VCPKG_CMAKE_PATH} CACHE STRING "Vcpkg toolchain file")
 
 set(vst3sdk_SOURCE_DIR "C:/VST_SDK/vst3sdk")
 if (NOT vst3sdk_SOURCE_DIR)
