@@ -38,7 +38,7 @@ namespace ARK {
                 return kResultFalse;
             }
 
-            if (!Win32Window::Create(parentHandle, L"ARKGainViewClass", L"ARKGain")) {
+            if (!Win32Window::Create(parentHandle, L"ARKGainViewClass", L"ARKGainView")) {
                 return kResultFalse;
             }
         }
@@ -47,10 +47,9 @@ namespace ARK {
     }
 
     tresult View::removed() {
-        // if (PLATFORM_WIN32(m_Type)) {
-        //     Win32Window::Destroy();
-        //     m_Type = DEFAULT_PLATFORM;
-        // }
+        if (PLATFORM_WIN32(m_Type)) {
+            Win32Window::Destroy();
+        }
 
         return kResultTrue;
     }

@@ -4,21 +4,30 @@
 
 #include "Win32Window.h"
 
+#include "GraphicsContext.h"
+
 namespace ARK::Win32Window {
-    HWND k_Hwnd;
+    HWND g_Hwnd;
+    std::unique_ptr<GraphicsContext> g_GraphicsContext;
+    LPCWSTR g_pszClassName;
+    LPCWSTR g_pszWindowTitle;
 
     bool Create(HWND parent, LPCWSTR className, LPCWSTR title) {
-        if (!k_Hwnd) {
+        g_pszClassName   = className;
+        g_pszWindowTitle = title;
+
+        if (!g_Hwnd) {
             WNDCLASSW wc     = {};
             wc.lpfnWndProc   = WindowProc;
             wc.hInstance     = GetModuleHandle(nullptr);
             wc.lpszClassName = className;
-            auto result      = RegisterClassW(&wc);
+
+            const auto result = RegisterClassW(&wc);
             if (!result) {
                 return false;
             }
 
-            k_Hwnd = CreateWindowExW(0,
+            g_Hwnd = CreateWindowExW(0,
                                      className,
                                      title,
                                      WS_CHILD | WS_VISIBLE,  // Window style
@@ -31,19 +40,29 @@ namespace ARK::Win32Window {
                                      GetModuleHandle(nullptr),  // Instance handle
                                      nullptr);
 
-            if (!k_Hwnd) {
+            if (!g_Hwnd) {
                 return false;
             }
+        }
+
+        if (!g_GraphicsContext) {
+            // Create graphics context
+            g_GraphicsContext = std::make_unique<GraphicsContext>();
         }
 
         return true;
     }
 
     void Destroy() {
-        if (k_Hwnd) {
-            DestroyWindow(k_Hwnd);
-            k_Hwnd = nullptr;
+        if (g_Hwnd) {
+            DestroyWindow(g_Hwnd);
+            g_Hwnd = nullptr;
+            UnregisterClassW(g_pszClassName, GetModuleHandle(nullptr));
         }
+    }
+
+    HWND GetWindowHandle() {
+        return g_Hwnd;
     }
 
     LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -51,14 +70,15 @@ namespace ARK::Win32Window {
             case WM_PAINT: {
                 PAINTSTRUCT ps;
                 HDC hdc        = BeginPaint(hwnd, &ps);
-                HBRUSH bgBrush = CreateSolidBrush(RGB(10, 11, 16));
+                HBRUSH bgBrush = CreateSolidBrush(RGB(255, 11, 16));
                 FillRect(hdc, &ps.rcPaint, bgBrush);
                 DeleteObject(bgBrush);
                 // Add any drawing code here...
+                g_GraphicsContext->Draw();
                 EndPaint(hwnd, &ps);
             } break;
             case WM_DESTROY: {
-                DestroyWindow(hwnd);
+                g_Hwnd = nullptr;
             } break;
             default:
                 return DefWindowProc(hwnd, msg, wParam, lParam);

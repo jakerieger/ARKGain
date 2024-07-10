@@ -14,5 +14,7 @@ namespace ARK::Win32Window {
     bool Create(HWND parent, LPCWSTR className, LPCWSTR title);
     void Destroy();
 
+    HWND GetWindowHandle();
+
     static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }  // namespace ARK::Win32Window

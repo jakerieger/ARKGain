@@ -5,6 +5,7 @@
 #include "Controller.h"
 #include "CIDs.h"
 #include "View.h"
+#include "ParameterIds.h"
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/base/ustring.h"
 
@@ -26,9 +27,12 @@ namespace ARK {
 
         // Here you could register some parameters
         const auto gainParam =
-          new Vst::RangeParameter(USTRING("Gain"), 0, USTRING("dB"), -60.0f, 30.0f, 0.000001f);
+          new Vst::RangeParameter(USTRING("Gain"), kGain, USTRING("dB"), -60.0f, 30.0f, 0.000001f);
+        const auto balanceParam =
+          new Vst::RangeParameter(USTRING("Balance"), kBalance, USTRING("R"), -50.0f, 50.0f, 0.0f);
 
         parameters.addParameter(gainParam);
+        parameters.addParameter(balanceParam);
 
         return result;
     }
@@ -50,11 +54,18 @@ namespace ARK {
         IBStreamer streamer(state, kLittleEndian);
 
         float gain;
+        float balance;
+
         if (streamer.readFloat(gain) == false) {
             return kResultFalse;
         }
 
-        setParamNormalized(0, gain);
+        if (streamer.readFloat(balance) == false) {
+            return kResultFalse;
+        }
+
+        setParamNormalized(kGain, gain);
+        setParamNormalized(kBalance, balance);
 
         return kResultOk;
     }

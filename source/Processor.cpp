@@ -4,6 +4,7 @@
 
 #include "Processor.h"
 #include "CIDs.h"
+#include "ParameterIds.h"
 
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
@@ -84,7 +85,8 @@ namespace ARK {
     ARKGainProcessor::ARKGainProcessor() {
         //--- set the wanted controller for our processor
         setControllerClass(kARKGainControllerUID);
-        mGain = 0.0f;
+        m_Gain    = 0.0f;
+        m_Balance = 0.0f;
     }
 
     //------------------------------------------------------------------------
@@ -136,12 +138,20 @@ namespace ARK {
                     int32 sampleOffset;
                     int32 numPoints = paramQueue->getPointCount();
                     switch (paramQueue->getParameterId()) {
-                        case 0:
+                        case kGain:
                             if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) ==
                                 kResultTrue) {
-                                mGain = static_cast<float>(value * 90.0 -
-                                                           60.0);  // convert back from normalized
-                                                                   // param value (-60.f <-> 30.f)
+                                m_Gain = static_cast<float>(value * 90.0 -
+                                                            60.0);  // convert back from normalized
+                                                                    // param value (-60.f <-> 30.f)
+                            }
+                            break;
+                        case kBalance:
+                            if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) ==
+                                kResultTrue) {
+                                m_Balance = static_cast<float>(
+                                  value * 100.0 - 50.0);  // convert back from normalized
+                                // param value (-50.f <-> 50.f)
                             }
                             break;
                         default:
@@ -187,7 +197,7 @@ namespace ARK {
         const auto numInChannels  = data.inputs->numChannels;
         const auto numOutChannels = data.outputs->numChannels;
 
-        auto linearGain = DSP::dBToLinear(mGain);
+        auto linearGain = DSP::dBToLinear(m_Gain);
 
         // Mono to Mono
         if (numInChannels == 1 && numOutChannels == 1) {
@@ -241,7 +251,11 @@ namespace ARK {
     tresult PLUGIN_API ARKGainProcessor::setState(IBStream* state) {
         // called when we load a preset, the model has to be reloaded
         IBStreamer streamer(state, kLittleEndian);
-        if (streamer.readFloat(mGain) == false) {
+        if (streamer.readFloat(m_Gain) == false) {
+            return kResultFalse;
+        }
+
+        if (streamer.readFloat(m_Balance) == false) {
             return kResultFalse;
         }
 
@@ -252,7 +266,8 @@ namespace ARK {
     tresult PLUGIN_API ARKGainProcessor::getState(IBStream* state) {
         // here we need to save the model
         IBStreamer streamer(state, kLittleEndian);
-        streamer.writeFloat(mGain);
+        streamer.writeFloat(m_Gain);
+        streamer.writeFloat(m_Balance);
 
         return kResultOk;
     }
