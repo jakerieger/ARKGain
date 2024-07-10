@@ -7,7 +7,6 @@
 #include "View.h"
 #include "base/source/fstreamer.h"
 #include "pluginterfaces/base/ustring.h"
-#include "vstgui/plugin-bindings/vst3editor.h"
 
 using namespace Steinberg;
 

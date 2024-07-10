@@ -3,65 +3,54 @@
 //
 
 #include "View.h"
+#include "Win32Window.h"
+#include "base/source/fstring.h"
 
-#define PLATFORM_WIN32 std::strcmp(type, kPlatformTypeHWND) == 0
-#define PLATFORM_X11 std::strcmp(type, kPlatformTypeX11EmbedWindowID) == 0
-#define PLATFORM_DARWIN std::strcmp(type, kPlatformTypeNSView) == 0
+#include <nanosvg.h>
+
+#define PLATFORM_WIN32(X) std::strcmp((X), kPlatformTypeHWND) == 0
+#define PLATFORM_X11(X) std::strcmp((X), kPlatformTypeX11EmbedWindowID) == 0
+#define PLATFORM_DARWIN(X) std::strcmp((X), kPlatformTypeNSView) == 0
 
 namespace ARK {
     using namespace Steinberg;
 
     tresult View::isPlatformTypeSupported(FIDString type) {
-        if (PLATFORM_WIN32) {
+        m_Type = type;
+
+        if (PLATFORM_WIN32(type) || PLATFORM_X11(type) || PLATFORM_DARWIN(type)) {
             return kResultTrue;
         }
-
         return kResultFalse;
     }
 
     tresult View::attached(void* parent, FIDString type) {
-        if (PLATFORM_WIN32) {
-            // Create GUI here and attach it to the parent
-            // For example, create a window and set its parent to the provided handle
+        m_Type = type;
 
-            HWND parentHwnd = (HWND)parent;
-
-            // Define a class for the window
-            WNDCLASS wc      = {};
-            wc.lpfnWndProc   = WindowProc;
-            wc.hInstance     = GetModuleHandle(nullptr);
-            wc.lpszClassName = L"ARKGainWindowClass";
-            RegisterClass(&wc);
-
-            // Create the window
-            mHwnd = CreateWindowEx(0,                      // Optional window styles.
-                                   L"ARKGainWindowClass",  // Window class
-                                   L"ARKGain",             // Window text
-                                   WS_CHILD | WS_VISIBLE,  // Window style
-                                   0,
-                                   0,
-                                   600,
-                                   300,                       // Size and position
-                                   parentHwnd,                // Parent window
-                                   nullptr,                   // Menu
-                                   GetModuleHandle(nullptr),  // Instance handle
-                                   this                       // Additional application data
-            );
-
-            if (!mHwnd)
-                return kResultFalse;
-
-            return kResultTrue;
+        const tresult result = EditorView::attached(parent, type);
+        if (result != kResultOk) {
+            return result;
         }
 
-        return kResultFalse;
+        if (PLATFORM_WIN32(type)) {
+            auto parentHandle = (HWND)parent;
+            if (!parentHandle) {
+                return kResultFalse;
+            }
+
+            if (!Win32Window::Create(parentHandle, L"ARKGainViewClass", L"ARKGain")) {
+                return kResultFalse;
+            }
+        }
+
+        return kResultTrue;
     }
 
     tresult View::removed() {
-        if (mHwnd) {
-            DestroyWindow(mHwnd);
-            mHwnd = nullptr;
-        }
+        // if (PLATFORM_WIN32(m_Type)) {
+        //     Win32Window::Destroy();
+        //     m_Type = DEFAULT_PLATFORM;
+        // }
 
         return kResultTrue;
     }
@@ -88,14 +77,8 @@ namespace ARK {
     }
 
     tresult View::onSize(ViewRect* newSize) {
-        if (mHwnd) {
-            SetWindowPos(mHwnd,
-                         nullptr,
-                         0,
-                         0,
-                         newSize->getWidth(),
-                         newSize->getHeight(),
-                         SWP_NOZORDER | SWP_NOMOVE);
+        if (newSize) {
+            // update viewport
         }
 
         return kResultTrue;
@@ -119,35 +102,9 @@ namespace ARK {
 
     void View::Draw() const {}
 
-    LRESULT CALLBACK View::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-        View* view = nullptr;
-        if (uMsg == WM_NCCREATE) {
-            const auto* cs = reinterpret_cast<CREATESTRUCT*>(lParam);
-            view           = static_cast<View*>(cs->lpCreateParams);
-            SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(view));
-        } else {
-            view = reinterpret_cast<View*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-        }
+    void View::Cleanup() {}
 
-        if (view) {
-            switch (uMsg) {
-                case WM_PAINT: {
-                    view->Draw();
-                    return 0;
-                }
+    void View::CreateOpenGLContext() {}
 
-                case WM_DESTROY: {
-                    PostQuitMessage(0);
-                    return 0;
-                }
-
-                    // Handle other messages here...
-
-                default:
-                    return DefWindowProc(hwnd, uMsg, wParam, lParam);
-            }
-        }
-
-        return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
+    void View::DestroyOpenGLContext() {}
 }  // namespace ARK

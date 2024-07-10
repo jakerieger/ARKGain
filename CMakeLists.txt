@@ -33,24 +33,10 @@ smtg_add_vst3plugin(ARKGain
         source/Factory.cpp
         source/View.h
         source/View.cpp
+        source/Platform.h
+        source/Win32Window.cpp
+        source/Win32Window.h
 )
-
-#- VSTGUI Wanted ----
-if (SMTG_ENABLE_VSTGUI_SUPPORT)
-    target_sources(ARKGain
-            PRIVATE
-            resource/ARKeditor.uidesc
-    )
-    target_link_libraries(ARKGain
-            PRIVATE
-            vstgui_support
-    )
-    smtg_target_add_plugin_resources(ARKGain
-            RESOURCES
-            "resource/ARKeditor.uidesc"
-    )
-endif (SMTG_ENABLE_VSTGUI_SUPPORT)
-# -------------------
 
 smtg_target_add_plugin_snapshots(ARKGain
         RESOURCES
@@ -58,9 +44,18 @@ smtg_target_add_plugin_snapshots(ARKGain
         resource/92F2B27B99945A8BBD45AC45A00B357A_snapshot_2.0x.png
 )
 
+smtg_target_add_plugin_resource(ARKGain resource/ui.svg)
+
+find_package(NanoSVG CONFIG REQUIRED)
+find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+
+
 target_link_libraries(ARKGain
         PRIVATE
         sdk
+        NanoSVG::nanosvg
+        OpenGL::GL
+        OpenGL::GLU
 )
 
 smtg_target_configure_version_file(ARKGain)

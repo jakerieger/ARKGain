@@ -6,17 +6,13 @@
 
 #include "public.sdk/source/vst/vsteditcontroller.h"
 
-#include <Windows.h>
-
-// TODO: Implement IPlugView here. This is the class that handles the actual UI.
+#define DEFAULT_PLATFORM "unknown"
 
 namespace ARK {
     class View final : public Steinberg::Vst::EditorView {
     public:
         explicit View(Steinberg::Vst::EditController* controller)
-            : EditorView(controller), mHwnd(nullptr) {}
-
-        ~View() SMTG_OVERRIDE {}
+            : EditorView(controller), m_Type(DEFAULT_PLATFORM) {}
 
         Steinberg::tresult PLUGIN_API isPlatformTypeSupported(Steinberg::FIDString type)
           SMTG_OVERRIDE;
@@ -37,11 +33,12 @@ namespace ARK {
         Steinberg::tresult PLUGIN_API canResize() SMTG_OVERRIDE;
         Steinberg::tresult PLUGIN_API checkSizeConstraint(Steinberg::ViewRect* rect) SMTG_OVERRIDE;
 
-        static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
     private:
         void Draw() const;
+        void Cleanup();
+        void CreateOpenGLContext();
+        void DestroyOpenGLContext();
 
-        HWND mHwnd;
+        Steinberg::FIDString m_Type;
     };
 }  // namespace ARK
