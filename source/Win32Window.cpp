@@ -8,7 +8,7 @@
 
 namespace ARK::Win32Window {
     HWND g_Hwnd;
-    std::unique_ptr<GraphicsContext> g_GraphicsContext;
+    std::unique_ptr<WindowsGraphicsContext> g_GraphicsContext;
     LPCWSTR g_ClassName;
     LPCWSTR g_WindowTitle;
 
@@ -46,7 +46,7 @@ namespace ARK::Win32Window {
         }
 
         if (!g_GraphicsContext) {
-            g_GraphicsContext = std::make_unique<GraphicsContext>();
+            g_GraphicsContext = std::make_unique<WindowsGraphicsContext>();
             if (!g_GraphicsContext->Initialize(&g_Hwnd)) {
                 return false;
             }
