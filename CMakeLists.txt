@@ -44,6 +44,10 @@ smtg_add_vst3plugin(ARKGain
         source/ParameterIds.h
         source/GraphicsContext.h
         source/GraphicsContext.cpp
+        source/X11Window.h
+        source/X11Window.cpp
+        source/MacOSWindow.h
+        source/MacOSWindow.cpp
 )
 
 smtg_target_add_plugin_snapshots(ARKGain
