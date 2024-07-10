@@ -9,12 +9,12 @@
 namespace ARK::Win32Window {
     HWND g_Hwnd;
     std::unique_ptr<GraphicsContext> g_GraphicsContext;
-    LPCWSTR g_pszClassName;
-    LPCWSTR g_pszWindowTitle;
+    LPCWSTR g_ClassName;
+    LPCWSTR g_WindowTitle;
 
     bool Create(HWND parent, LPCWSTR className, LPCWSTR title) {
-        g_pszClassName   = className;
-        g_pszWindowTitle = title;
+        g_ClassName   = className;
+        g_WindowTitle = title;
 
         if (!g_Hwnd) {
             WNDCLASSW wc     = {};
@@ -48,6 +48,9 @@ namespace ARK::Win32Window {
         if (!g_GraphicsContext) {
             // Create graphics context
             g_GraphicsContext = std::make_unique<GraphicsContext>();
+            if (!g_GraphicsContext->Initialize(&g_Hwnd)) {
+                return false;
+            }
         }
 
         return true;
@@ -57,7 +60,12 @@ namespace ARK::Win32Window {
         if (g_Hwnd) {
             DestroyWindow(g_Hwnd);
             g_Hwnd = nullptr;
-            UnregisterClassW(g_pszClassName, GetModuleHandle(nullptr));
+            UnregisterClassW(g_ClassName, GetModuleHandle(nullptr));
+        }
+
+        if (g_GraphicsContext) {
+            g_GraphicsContext->Shutdown(&g_Hwnd);
+            g_GraphicsContext.reset();
         }
     }
 
