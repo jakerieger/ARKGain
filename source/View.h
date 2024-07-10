@@ -34,11 +34,6 @@ namespace ARK {
         Steinberg::tresult PLUGIN_API checkSizeConstraint(Steinberg::ViewRect* rect) SMTG_OVERRIDE;
 
     private:
-        void Draw() const;
-        void Cleanup();
-        void CreateOpenGLContext();
-        void DestroyOpenGLContext();
-
         Steinberg::FIDString m_Type;
     };
 }  // namespace ARK

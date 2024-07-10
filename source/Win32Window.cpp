@@ -46,7 +46,6 @@ namespace ARK::Win32Window {
         }
 
         if (!g_GraphicsContext) {
-            // Create graphics context
             g_GraphicsContext = std::make_unique<GraphicsContext>();
             if (!g_GraphicsContext->Initialize(&g_Hwnd)) {
                 return false;
@@ -76,14 +75,7 @@ namespace ARK::Win32Window {
     LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         switch (msg) {
             case WM_PAINT: {
-                PAINTSTRUCT ps;
-                HDC hdc        = BeginPaint(hwnd, &ps);
-                HBRUSH bgBrush = CreateSolidBrush(RGB(255, 11, 16));
-                FillRect(hdc, &ps.rcPaint, bgBrush);
-                DeleteObject(bgBrush);
-                // Add any drawing code here...
                 g_GraphicsContext->Draw();
-                EndPaint(hwnd, &ps);
             } break;
             case WM_DESTROY: {
                 g_Hwnd = nullptr;

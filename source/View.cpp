@@ -98,12 +98,4 @@ namespace ARK {
     tresult View::checkSizeConstraint(ViewRect* rect) {
         return EditorView::checkSizeConstraint(rect);
     }
-
-    void View::Draw() const {}
-
-    void View::Cleanup() {}
-
-    void View::CreateOpenGLContext() {}
-
-    void View::DestroyOpenGLContext() {}
 }  // namespace ARK
