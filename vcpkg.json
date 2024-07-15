@@ -1,15 +1,11 @@
 {
-  "name" : "arkgain",
-  "version-string" : "1.0.0",
-  "builtin-baseline" : "01f602195983451bc83e72f4214af2cbc495aa94",
-  "dependencies" : [ {
-    "name" : "pkgconf",
-    "version>=" : "2.2.0"
-  }, {
-    "name" : "nanosvg",
-    "version>=" : "2023-12-29"
-  }, {
-    "name" : "opengl",
-    "version>=" : "2022-12-04#3"
-  } ]
+  "name": "arkgain",
+  "version-string": "1.0.0",
+  "builtin-baseline": "01f602195983451bc83e72f4214af2cbc495aa94",
+  "dependencies": [
+    {
+      "name": "pkgconf",
+      "version>=": "2.2.0"
+    }
+  ]
 }

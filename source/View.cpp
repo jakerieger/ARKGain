@@ -3,10 +3,8 @@
 //
 
 #include "View.h"
-#include "Win32Window.h"
+#include "Canvas.h"
 #include "base/source/fstring.h"
-
-#include <nanosvg.h>
 
 #define PLATFORM_WIN32(X) std::strcmp((X), kPlatformTypeHWND) == 0
 #define PLATFORM_X11(X) std::strcmp((X), kPlatformTypeX11EmbedWindowID) == 0
@@ -32,24 +30,15 @@ namespace ARK {
             return result;
         }
 
-        if (PLATFORM_WIN32(type)) {
-            auto parentHandle = (HWND)parent;
-            if (!parentHandle) {
-                return kResultFalse;
-            }
-
-            if (!Win32Window::Create(parentHandle, L"ARKGainViewClass", L"ARKGainView")) {
-                return kResultFalse;
-            }
-        }
+        m_PluginCanvas = new Canvas();
+        m_PluginCanvas->AttachToParent(parent);
 
         return kResultTrue;
     }
 
     tresult View::removed() {
-        if (PLATFORM_WIN32(m_Type)) {
-            Win32Window::Destroy();
-        }
+        delete m_PluginCanvas;
+        m_PluginCanvas = nullptr;
 
         return kResultTrue;
     }

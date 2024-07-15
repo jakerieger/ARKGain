@@ -1,0 +1,3 @@
+[submodule "ArkVector"]
+	path = ArkVector
+	url = git@github.com:jakerieger/ArkVector.git

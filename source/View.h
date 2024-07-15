@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Interfaces/PluginCanvas.h"
 #include "public.sdk/source/vst/vsteditcontroller.h"
 
 #define DEFAULT_PLATFORM "unknown"
@@ -35,5 +36,6 @@ namespace ARK {
 
     private:
         Steinberg::FIDString m_Type;
+        ArkVector::IPluginCanvas* m_PluginCanvas = nullptr;
     };
 }  // namespace ARK

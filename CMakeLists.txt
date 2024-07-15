@@ -26,9 +26,11 @@ project(ARKGain
 )
 
 add_subdirectory(${vst3sdk_SOURCE_DIR} ${PROJECT_BINARY_DIR}/vst3sdk)
+add_subdirectory(ArkVector)
 smtg_enable_vst3_sdk()
 
 smtg_add_vst3plugin(ARKGain
+        # plugin sources
         source/version.h
         source/CIDs.h
         source/Processor.h
@@ -39,15 +41,9 @@ smtg_add_vst3plugin(ARKGain
         source/View.h
         source/View.cpp
         source/Platform.h
-        source/Win32Window.cpp
-        source/Win32Window.h
         source/ParameterIds.h
-        source/GraphicsContext.h
-        source/GraphicsContext.cpp
-        source/X11Window.h
-        source/X11Window.cpp
-        source/MacOSWindow.h
-        source/MacOSWindow.cpp
+        source/Canvas.h
+        source/Canvas.cpp
 )
 
 smtg_target_add_plugin_snapshots(ARKGain
@@ -58,17 +54,17 @@ smtg_target_add_plugin_snapshots(ARKGain
 
 smtg_target_add_plugin_resource(ARKGain resource/ui.svg)
 
-find_package(NanoSVG CONFIG REQUIRED)
-find_package(OpenGL REQUIRED COMPONENTS OpenGL)
-
+include_directories(ArkVector/Lib)
 
 target_link_libraries(ARKGain
         PRIVATE
         sdk
-        NanoSVG::nanosvg
-        OpenGL::GL
-        OpenGL::GLU
+        ArkVector
 )
+
+#include_directories(
+#        ${CMAKE_CURRENT_BINARY_DIR}/vcpkg_installed/x64-windows-static/include
+#)
 
 smtg_target_configure_version_file(ARKGain)
 
